@@ -52,7 +52,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 label: 'Feed',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.location_on_outlined),
+                icon: Icon(Icons.favorite_border),
                 label: 'Liked',
               ),
               BottomNavigationBarItem(

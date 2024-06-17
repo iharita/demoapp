@@ -6,16 +6,16 @@ class PostResponse {
   String? title;
   List<String>? image;
   List<String>? tags;
-  List<Null>? likedUsers;
+  List<String>? likedUsers;
   String? eventCategory;
   String? eventStartAt;
   String? eventEndAt;
   String? eventId;
   bool? registrationRequired;
-  List<Null>? registration;
+  List<String>? registration;
   String? eventDescription;
   int? likes;
-  List<Null>? comments;
+  List<String>? comments;
   String? createdAt;
   int? iV;
 
@@ -42,72 +42,51 @@ class PostResponse {
 
   PostResponse.fromJson(Map<String, dynamic> json) {
     eventLocation = json['eventLocation'] != null
-        ? new EventLocation.fromJson(json['eventLocation'])
+        ? EventLocation.fromJson(json['eventLocation'])
         : null;
     sId = json['_id'];
     userId = json['userId'];
     description = json['description'];
     title = json['title'];
-    image = json['image'].cast<String>();
-    tags = json['tags'].cast<String>();
-    if (json['likedUsers'] != null) {
-      likedUsers = <Null>[];
-      json['likedUsers'].forEach((v) {
-        likedUsers!.add(new Null.fromJson(v));
-      });
-    }
+    image = json['image'] != null ? List<String>.from(json['image']) : null;
+    tags = json['tags'] != null ? List<String>.from(json['tags']) : null;
+    likedUsers = json['likedUsers'] != null ? List<String>.from(json['likedUsers']) : null;
     eventCategory = json['eventCategory'];
     eventStartAt = json['eventStartAt'];
     eventEndAt = json['eventEndAt'];
     eventId = json['eventId'];
     registrationRequired = json['registrationRequired'];
-    if (json['registration'] != null) {
-      registration = <Null>[];
-      json['registration'].forEach((v) {
-        registration!.add(new Null.fromJson(v));
-      });
-    }
+    registration = json['registration'] != null ? List<String>.from(json['registration']) : null;
     eventDescription = json['eventDescription'];
     likes = json['likes'];
-    if (json['comments'] != null) {
-      comments = <Null>[];
-      json['comments'].forEach((v) {
-        comments!.add(new Null.fromJson(v));
-      });
-    }
+    comments = json['comments'] != null ? List<String>.from(json['comments']) : null;
     createdAt = json['createdAt'];
     iV = json['__v'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.eventLocation != null) {
-      data['eventLocation'] = this.eventLocation!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (eventLocation != null) {
+      data['eventLocation'] = eventLocation!.toJson();
     }
-    data['_id'] = this.sId;
-    data['userId'] = this.userId;
-    data['description'] = this.description;
-    data['title'] = this.title;
-    data['image'] = this.image;
-    data['tags'] = this.tags;
-    if (this.likedUsers != null) {
-      data['likedUsers'] = this.likedUsers!.map((v) => v.toJson()).toList();
-    }
-    data['eventCategory'] = this.eventCategory;
-    data['eventStartAt'] = this.eventStartAt;
-    data['eventEndAt'] = this.eventEndAt;
-    data['eventId'] = this.eventId;
-    data['registrationRequired'] = this.registrationRequired;
-    if (this.registration != null) {
-      data['registration'] = this.registration!.map((v) => v.toJson()).toList();
-    }
-    data['eventDescription'] = this.eventDescription;
-    data['likes'] = this.likes;
-    if (this.comments != null) {
-      data['comments'] = this.comments!.map((v) => v.toJson()).toList();
-    }
-    data['createdAt'] = this.createdAt;
-    data['__v'] = this.iV;
+    data['_id'] = sId;
+    data['userId'] = userId;
+    data['description'] = description;
+    data['title'] = title;
+    data['image'] = image;
+    data['tags'] = tags;
+    data['likedUsers'] = likedUsers;
+    data['eventCategory'] = eventCategory;
+    data['eventStartAt'] = eventStartAt;
+    data['eventEndAt'] = eventEndAt;
+    data['eventId'] = eventId;
+    data['registrationRequired'] = registrationRequired;
+    data['registration'] = registration;
+    data['eventDescription'] = eventDescription;
+    data['likes'] = likes;
+    data['comments'] = comments;
+    data['createdAt'] = createdAt;
+    data['__v'] = iV;
     return data;
   }
 }
@@ -120,13 +99,13 @@ class EventLocation {
 
   EventLocation.fromJson(Map<String, dynamic> json) {
     type = json['type'];
-    coordinates = json['coordinates'].cast<double>();
+    coordinates = json['coordinates'] != null ? List<double>.from(json['coordinates']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    data['coordinates'] = this.coordinates;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    data['coordinates'] = coordinates;
     return data;
   }
 }
