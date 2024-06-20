@@ -56,7 +56,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 label: 'Community',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.save),
+                icon: Icon(Icons.bookmark_border),
                 label: 'Saved',
               ),
             ],

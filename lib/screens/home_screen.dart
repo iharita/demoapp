@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:demoapp/app_colors.dart'; // Assuming you have defined app_colors.dart
+import 'package:demoapp/screens/comments_screen.dart';
+import 'package:demoapp/app_colors.dart';
 import 'package:demoapp/services/apis.dart';
 import 'package:demoapp/model/posts_response.dart';
 
@@ -18,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<PostResponse> posts = [];
   Map<String, bool> likedPosts = {}; // Map to track liked status of posts
   Map<String, int> likesCount = {}; // Map to track like counts
+  Map<String, bool> savedPosts = {}; // Map to track saved status of posts
   bool showOnlyLiked = false; // Flag to show only liked posts
   bool isLoading = false; // Flag to indicate if data is being loaded
   int page = 0; // Page number to fetch posts incrementally
@@ -27,23 +29,45 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     scrollController.addListener(_scrollListener);
+    loadSavedPosts();
     fetchPosts();
   }
 
-  // Method to copy a post with a unique identifier
-  PostResponse copyPostWithUniqueId(PostResponse original, int index) {
-    return PostResponse(
-      sId: '${original.sId}_$index', // Append index to original ID to make it unique
-      title: original.title,
-      description: original.description,
-      image: original.image,
-      eventLocation: original.eventLocation,
-      eventStartAt: original.eventStartAt,
-      eventEndAt: original.eventEndAt,
-      likes: original.likes,
-      likedUsers: List.from(original.likedUsers ?? []), // Make a copy of the list
-      comments: List.from(original.comments ?? []), // Make a copy of the list
-    );
+  Future<void> loadSavedPosts() async {
+    // Load saved posts from local storage (e.g., SharedPreferences)
+    // Here we simulate loading from SharedPreferences
+    // You can replace this with actual implementation using your storage solution
+    // Example using SharedPreferences (add shared_preferences to pubspec.yaml)
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Set<String> savedPostIds = prefs.getStringList('savedPosts')?.toSet() ?? {};
+    // setState(() {
+    //   for (var id in savedPostIds) {
+    //     savedPosts[id] = true;
+    //   }
+    // });
+
+    // Simulated example:
+    setState(() {
+      savedPosts = {
+        'post1': true,
+        'post3': true,
+      };
+    });
+  }
+
+  Future<void> savePostState() async {
+    // Save posts state to local storage (e.g., SharedPreferences)
+    // Here we simulate saving to SharedPreferences
+    // Example using SharedPreferences (add shared_preferences to pubspec.yaml)
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // List<String> savedPostIds = savedPosts.entries
+    //     .where((entry) => entry.value == true)
+    //     .map((entry) => entry.key)
+    //     .toList();
+    // prefs.setStringList('savedPosts', savedPostIds);
+
+    // Simulated example:
+    print('Saving posts state: $savedPosts');
   }
 
   void fetchPosts() async {
@@ -64,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         for (var post in fetchedPosts) {
           likedPosts[post.sId!] = likedPosts[post.sId!] ?? false; // Maintain previous like status if exists
           likesCount[post.sId!] = post.likes ?? 0; // Initialize like count from API
+          savedPosts[post.sId!] = savedPosts[post.sId!] ?? false; // Initialize saved status
         }
         page++; // Increment page number
       });
@@ -74,6 +99,22 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     }
+  }
+
+  // Method to copy a post with a unique identifier
+  PostResponse copyPostWithUniqueId(PostResponse original, int index) {
+    return PostResponse(
+      sId: '${original.sId}_$index', // Append index to original ID to make it unique
+      title: original.title,
+      description: original.description,
+      image: original.image,
+      eventLocation: original.eventLocation,
+      eventStartAt: original.eventStartAt,
+      eventEndAt: original.eventEndAt,
+      likes: original.likes,
+      likedUsers: List.from(original.likedUsers ?? []), // Make a copy of the list
+      comments: List.from(original.comments ?? []), // Make a copy of the list
+    );
   }
 
   void toggleLike(PostResponse post) {
@@ -89,6 +130,17 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       likesCount[post.sId!] = post.likedUsers?.length ?? 0;
+    });
+  }
+
+  void toggleSave(PostResponse post) {
+    setState(() {
+      if (savedPosts[post.sId] == true) {
+        savedPosts[post.sId!] = false;
+      } else {
+        savedPosts[post.sId!] = true;
+      }
+      savePostState(); // Save the state whenever a post is saved or unsaved
     });
   }
 
@@ -126,11 +178,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void updatePostComments(PostResponse updatedPost) {
+    setState(() {
+      int index = posts.indexWhere((post) => post.sId == updatedPost.sId);
+      if (index != -1) {
+        posts[index] = updatedPost;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<PostResponse> displayedPosts = showOnlyLiked
-        ? likedList
-        : posts; // Display liked posts only if showOnlyLiked is true
+    List<PostResponse> displayedPosts = showOnlyLiked ? likedList : posts; // Display liked posts only if showOnlyLiked is true
 
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
@@ -316,47 +375,67 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.mode_comment_outlined,
-                                        size: 24,
-                                        color: Colors.grey,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${post.comments?.length ?? 0}',
-                                        style: const TextStyle(
-                                          fontSize: 16,
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final updatedPost = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CommentScreen(post: post),
+                                        ),
+                                      );
+                                      if (updatedPost != null) {
+                                        updatePostComments(updatedPost);
+                                      }
+                                    },
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.mode_comment_outlined,
+                                          size: 24,
                                           color: Colors.grey,
                                         ),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      const Text(
-                                        'Comments',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey,
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${post.comments?.length ?? 0}',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(width: 5),
+                                        const Text(
+                                          'Comments',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.share,
-                                        size: 24,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        'Share',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey,
+                                  GestureDetector(
+                                    onTap: () => toggleSave(post),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          savedPosts[post.sId] == true
+                                              ? Icons.bookmark
+                                              : Icons.bookmark_border,
+                                          size: 24,
+                                          color: savedPosts[post.sId] == true
+                                              ? Colors.blue
+                                              : Colors.grey,
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(width: 5),
+                                        const Text(
+                                          'Save',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -376,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _scrollListener() {
-    if (scrollController.position.pixels == scrollController.position.maxScrollExtent && !isLoading) {
+    if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
       fetchPosts();
     }
   }
