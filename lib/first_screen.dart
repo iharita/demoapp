@@ -1,4 +1,3 @@
-import 'package:demoapp/app_colors.dart';
 import 'package:demoapp/screens/community_screen.dart';
 import 'package:demoapp/screens/home_screen.dart';
 import 'package:demoapp/screens/liked_screen.dart';
@@ -17,7 +16,7 @@ class _FirstScreenState extends State<FirstScreen> {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    LikedScreen(),
+    LikedListScreen(),
     CommunityScreen(),
     SaveScreen()
   ];
@@ -31,12 +30,9 @@ class _FirstScreenState extends State<FirstScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: _widgetOptions[_selectedIndex]
-        ),
+        body: _widgetOptions[_selectedIndex],
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+          padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0),
           child: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.black87,
@@ -65,7 +61,7 @@ class _FirstScreenState extends State<FirstScreen> {
               ),
             ],
           ),
-        )
+    )
     );
   }
 }
