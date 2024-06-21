@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:demoapp/screens/comments_screen.dart';
 import 'package:demoapp/app_colors.dart';
 import 'package:demoapp/services/apis.dart';
@@ -34,40 +35,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadSavedPosts() async {
-    // Load saved posts from local storage (e.g., SharedPreferences)
-    // Here we simulate loading from SharedPreferences
-    // You can replace this with actual implementation using your storage solution
-    // Example using SharedPreferences (add shared_preferences to pubspec.yaml)
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Set<String> savedPostIds = prefs.getStringList('savedPosts')?.toSet() ?? {};
-    // setState(() {
-    //   for (var id in savedPostIds) {
-    //     savedPosts[id] = true;
-    //   }
-    // });
-
-    // Simulated example:
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Set<String> savedPostIds = prefs.getStringList('savedPosts')?.toSet() ?? {};
     setState(() {
-      savedPosts = {
-        'post1': true,
-        'post3': true,
-      };
+      for (var id in savedPostIds) {
+        savedPosts[id] = true;
+      }
     });
   }
 
   Future<void> savePostState() async {
-    // Save posts state to local storage (e.g., SharedPreferences)
-    // Here we simulate saving to SharedPreferences
-    // Example using SharedPreferences (add shared_preferences to pubspec.yaml)
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // List<String> savedPostIds = savedPosts.entries
-    //     .where((entry) => entry.value == true)
-    //     .map((entry) => entry.key)
-    //     .toList();
-    // prefs.setStringList('savedPosts', savedPostIds);
-
-    // Simulated example:
-    print('Saving posts state: $savedPosts');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> savedPostIds = savedPosts.entries
+        .where((entry) => entry.value == true)
+        .map((entry) => entry.key)
+        .toList();
+    prefs.setStringList('savedPosts', savedPostIds);
   }
 
   void fetchPosts() async {
